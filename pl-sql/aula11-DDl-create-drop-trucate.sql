@@ -1,0 +1,84 @@
+-- tables, views, sequences, index, synonym
+
+select * from hr.countries
+
+DDL -> Data definition language -- (create, alter,drop)
+
+create table <table_name>
+(
+ <column_name> <datatype> [<expr>],
+ <column_name> <datatype> [<expr>],
+   ...
+)
+
+create table DEPT
+(
+  DEPTO INT,
+  DNAME VARCHAR2(14),
+  LOC   VARCHAR2(13)
+)
+
+
+SELECT * FROM DEPT
+DESCRIBE DEPT
+
+---------------------------------------------------
+-- TIPOS DE DADOS
+
+VARCHAR2() --> CHARACTERS
+INT        --> NUMBERS
+NUMBERS()  --> NUMBERS
+DATE       --> DATE AND TIME
+TIMESTAMP  --> DATE AND TIME
+LOG        --> CHARACTERES UP 2GB
+BLOB       --> BINARY DATA
+----------------------------------------------------------
+
+USER_ --> USER IS PROPERTY
+ALL_  --> EVERYBODY 
+DBA_  --> JUST DBA USER HAVE ACCESS
+V$
+
+SELECT * FROM USER_TABLES
+
+SELECT * FROM ALL_TABLES  -- TABLES WHERE MY USER HAVE ACCESS
+SELECT * FROM DBA_TABLES  -- I DONT HAVE ACCES BUT EXIST
+
+-- LOOK USERS THAT HAVE SESSION IN DATABASE
+SELECT * FORM V$SESSION
+
+-- LOOKS ALL VALUES AND ORACLE PARAMETERS
+SELECT * FORM V$PARAMETERS
+
+-------------------------------------------------------------------------------------------------------
+ -- CREATE TABLES FROM A SELECT COMMAND
+
+CREATE TABLE DEP_AUX AS
+SELECT * FROM DEPARTMENTS WHERE DEPARTMENT_ID=80
+
+SELECT * FROM DEP_AUX
+
+ALTER TABLE DEP_AUX ADD LOC_ID INT;
+
+DESCRIME DEP_AUX;
+
+ALTER TABLE DEP_AUX MODIFY (LOC_ID VARCHAR(2))
+
+DESC DEP_AUX
+
+ALTER TABLE DEP_AUX DROP (LOC_ID)
+
+SELECT * FROM DEP_AUX;
+
+
+--TRUNCATE TABLE REMOVE VALUES OF THE TABLE
+
+TRUNCATE TABLE DEP_AUX 
+
+SELECT * FROM DEP_AUX
+
+RENAME DEP_AUX TO DEP_AUXIRIALY
+
+SELECT * FROM DEP_AUXIRIALY
+
+DROP TABLE DEP_AUXIRIALY
