@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<package name="aula04" extends="default" namespace="/aula04">
+		<action name="calcularIdade!*"
+			class="aula04.CalcularIdadeAction" method="{1}">
+			<result name="input">/WEB-INF/pages/aula04/form.jsp</result>
+			<result>/WEB-INF/pages/aula04/resultado.jsp</result>
+		</action>
+	</package>
+	<package name="aula05" extends="default" namespace="/aula05">
+		<action name="login!*"
+			class="aula05.LoginAction" method="{1}">
+			<result name="input">/WEB-INF/pages/aula05/form.jsp</result>
+			<result name="desenvolvedor" >/WEB-INF/pages/aula05/homeDesenvolvedor.jsp</result>
+			<result name="gerente">/WEB-INF/pages/aula05/homeGerente.jsp</result>
+			<result name="diretor">/WEB-INF/pages/aula05/homeDiretor.jsp</result>
+		</action>
+	</package>
+	<package name="aula06" extends="default" namespace="/aula06">
+		<action name="tags" class="aula06.TagsAction">
+			<result>/WEB-INF/pages/aula06/tags.jsp</result>
+		</action>
+		<action name="sub" class="aula06.TagsSubAction"/>
+	</package>
+</struts>
