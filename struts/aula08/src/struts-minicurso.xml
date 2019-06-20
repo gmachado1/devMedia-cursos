@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<package name="aula04" extends="default" namespace="/aula04">
+		<action name="calcularIdade!*"
+			class="aula04.CalcularIdadeAction" method="{1}">
+			<result name="input">/WEB-INF/pages/aula04/form.jsp</result>
+			<result>/WEB-INF/pages/aula04/resultado.jsp</result>
+		</action>
+	</package>
+	<package name="aula05" extends="default" namespace="/aula05">
+		<action name="login!*" class="aula05.LoginAction" method="{1}">
+			<result name="input">/WEB-INF/pages/aula05/form.jsp</result>
+			<result name="desenvolvedor">/WEB-INF/pages/aula05/homeDesenvolvedor.jsp
+			</result>
+			<result name="gerente">/WEB-INF/pages/aula05/homeGerente.jsp</result>
+			<result name="diretor">/WEB-INF/pages/aula05/homeDiretor.jsp</result>
+		</action>
+	</package>
+	<package name="aula06" extends="default" namespace="/aula06">
+		<action name="tags" class="aula06.TagsAction">
+			<result>/WEB-INF/pages/aula06/tags.jsp</result>
+		</action>
+		<action name="sub" class="aula06.TagsSubAction" />
+	</package>
+	<package name="freemarker-default" extends="default">
+		<result-types>
+		<!-- buscar "freemarker" dentro do arquivo "struts-default" localizado em struts-2.0.11.2/src/core/src/main/resources-->
+			<result-type name="freemarker" class="org.apache.struts2.views.freemarker.FreemarkerResult" default="true"/>
+		</result-types>
+	</package>
+	
+	<package name="aula07" extends="freemarker-default" namespace="/aula07">
+		<action name="calcularIdade!*" class="aula04.CalcularIdadeAction" method="{1}">
+			<result name="input">/WEB-INF/pages/aula07/form.ftl</result>
+			<result>/WEB-INF/pages/aula07/resultado.ftl</result>
+			<!-- >result type="freemarker"  name="input">/WEB-INF/pages/aula07/form.ftl</result>
+			<result  type="freemarker">/WEB-INF/pages/aula07/resultado.ftl</result -->
+		</action>
+	</package>
+</struts>
