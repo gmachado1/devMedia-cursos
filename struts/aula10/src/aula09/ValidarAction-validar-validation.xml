@@ -1,0 +1,43 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0.2//EN" "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+<validators>
+	<field name="nome">
+		<field-validator type="requiredstring"><!-- nulo e vazio -->
+			<message>Você deve digitar um nome.</message>
+		</field-validator>
+	</field>
+	<field name="tipo">
+		<field-validator type="required">
+			<message>Você deve escolher um tipo.</message>
+		</field-validator>
+	</field>
+	<field name="percentual">
+		<field-validator type="required"><!-- nulo -->
+			<message>Você deve digitar um percentual.</message>
+		</field-validator>
+		<field-validator type="int"><!-- inteiro intervalo 0 a 00 -->
+			<param name="min">0</param>
+			<param name="max">100</param>
+			<message>Você deve escolter um número entre 0 e 100.</message>
+		</field-validator>
+	</field>
+	<field name="dataNascimento">
+		<field-validator type="required">
+			<message>Você deve digitar uma data de Nascimento.</message>
+		</field-validator>
+		<field-validator type="date">
+			<message>Você deve digitar uma data válida.</message>
+		</field-validator>
+		<field-validator type="fieldexpression">
+			<param name="expression">(dataNascimento == null || (dataNascimento.before(agora))</param>
+			<message>Não são aceitas datas futuras.</message>
+		</field-validator>
+	</field>
+	<field name="email">
+		<field-validator type="requiredstring">
+			<message>Você deve digitar um endereço de e-mail</message>
+		</field-validator>
+		<field-validator type="email">
+			<message>Você deve digitar um endenreço de e-mail válido.</message>
+		</field-validator>
+	</field>
+</validators>
