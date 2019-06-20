@@ -1,43 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0.2//EN" "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
 	<field name="nome">
 		<field-validator type="requiredstring"><!-- nulo e vazio -->
-			<message>VocÃª deve digitar um nome.</message>
+			<message>Você deve digitar um nome.</message>
 		</field-validator>
 	</field>
 	<field name="tipo">
 		<field-validator type="required">
-			<message>VocÃª deve escolher um tipo.</message>
+			<message>Você deve escolher um tipo.</message>
 		</field-validator>
 	</field>
 	<field name="percentual">
 		<field-validator type="required"><!-- nulo -->
-			<message>VocÃª deve digitar um percentual.</message>
+			<message>Você deve digitar um percentual.</message>
 		</field-validator>
 		<field-validator type="int"><!-- inteiro intervalo 0 a 00 -->
 			<param name="min">0</param>
 			<param name="max">100</param>
-			<message>VocÃª deve escolter um nÃºmero entre 0 e 100.</message>
+			<message>Você deve escolter um número entre 0 e 100.</message>
 		</field-validator>
 	</field>
 	<field name="dataNascimento">
 		<field-validator type="required">
-			<message>VocÃª deve digitar uma data de Nascimento.</message>
+			<message>Você deve digitar uma data de Nascimento.</message>
 		</field-validator>
 		<field-validator type="date">
-			<message>VocÃª deve digitar uma data vÃ¡lida.</message>
+			<message>Você deve digitar uma data válida.</message>
 		</field-validator>
 		<field-validator type="fieldexpression">
 			<param name="expression">(dataNascimento == null || (dataNascimento.before(agora))</param>
-			<message>NÃ£o sÃ£o aceitas datas futuras.</message>
+			<message>Não são aceitas datas futuras.</message>
 		</field-validator>
 	</field>
 	<field name="email">
 		<field-validator type="requiredstring">
-			<message>VocÃª deve digitar um endereÃ§o de e-mail</message>
+			<message>Você deve digitar um endereço de e-mail</message>
 		</field-validator>
 		<field-validator type="email">
-			<message>VocÃª deve digitar um endenreÃ§o de e-mail vÃ¡lido.</message>
+			<message>Você deve digitar um endenreço de e-mail válido.</message>
 		</field-validator>
 	</field>
 </validators>
