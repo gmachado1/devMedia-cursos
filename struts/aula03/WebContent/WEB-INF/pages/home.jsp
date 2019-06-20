@@ -8,6 +8,6 @@
 <title>Aula 03 - Home</title>
 </head>
 <body>
-<h1>Aula 03 - seja bem vindo</h1>
+<h1>Aula 03 - Seja Bem Vindo!</h1>
 </body>
 </html>
