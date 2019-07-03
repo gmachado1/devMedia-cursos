@@ -1,0 +1,32 @@
+-----------------------------------------
+MONGODB AND JAVA
+-----------------------------------------
+
+1) JAVA:
+    1.1) SETUP DE ENVIRONMENT:
+        A) DOWNLOAD THE JAVA SDK:
+          http://www.oracle.com/technetwork/pt/java/javase/downloads/index.html
+          
+          
+        B) DOWNLOAD THE ECLIPSE IDE:
+        
+          https://eclipse.org/downloads/
+
+
+    1.2) DOWNLOAD THE DRIVER AT: https://github.com/mongodb/mongo-java-driver
+      
+         CHECK THE BINARIES AT: http://search.maven.org.
+    
+    1.3) THERE IS A JAVADOC OF THE DRIVER: http://api.mongodb.org/java/current/
+    
+    
+    1.4) INSERT THE .JAR FILE IN THE CLASSPATH:
+
+	SET CLASSPATH=.;C:\CursoMongoDB3\Video15\<DRIVER>.jar
+
+    1.5) START PROGRAMMING: HELLOWORLD.JAVA
+    
+    USE THE CLASSES OF THE com.mongodb PACKAGE
+    
+    
+    

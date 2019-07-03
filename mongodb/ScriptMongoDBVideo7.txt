@@ -1,0 +1,89 @@
+CAPPED COLLECTIONS
+------------------
+
+-- SPECIAL TYPE OF COLLECTION
+-- HAS A PREDEFINED SIZE (BYTES OR NUMBER OF DOCUMENTS)
+
+-- OLD DATA AUTOMATICALLY AGES OUT. OVERWRITEN BY NEW DOCUMENTS
+  -> CIRCULAR LOG EFFECT
+
+-- GARANTEE PRESERVATION OF THE INSERTION ORDER WITHOUT EXTRA INDEXES
+
+-- MAIN REASON TO USE: FAST INSERT (BULK INSERT) AND SEARCH OPPERATIONS 
+
+-- USE THE createCollection() METHOD
+  -- SIZE: NUMBER OF BYTES 
+  -- MAX: MAX NUMBER OF DOCUMENTS
+  
+  -- NOTE: ENSURE THE SIZE IS SUFFICENT TO CONTAINT THE DOCUMENTS LIMIT 
+  
+-- AFTER YOU CREATE THE COLLECTION YOU CAN INSERT DOCUMENTS
+-- FREE SCHEMA ALSO APPLY
+
+-- YOU CAN ALSO CONVERT YOUR NON CAPPED COLLECTIONS TO CAPPED COLLECTIONS
+-- EXAMPLE:
+
+db.runCommand({"convertToCapped":<collection_name>,size:10000})
+  
+-- EXAMPLES:
+------------
+
+
+>show dbs
+>use foo
+>show collections
+
+>db.createCollection("MyCappedCol", { capped:true, size: 2048 } )
+
+-- USE THE isCapped() METHOD TO CHECK IF A COLLECTION IS CAPPED
+
+db.MyCappedCol.isCapped()
+
+-- NORMAL INSERT OPERATIONS
+
+db.MyCappedCol.insert({col2: new Date()})
+db.MyCappedCol.insert({col1: 4})
+db.MyCappedCol.insert({col1: 'string data'})
+db.MyCappedCol.insert({col1: 33.33})
+db.MyCappedCol.insert({col1: new Date('November 25,2011')})
+db.MyCappedCol.insert({col1: ['first','second',3]})
+db.MyCappedCol.insert({col1: true})
+db.MyCappedCol.find()
+
+-- BY DEFAULT A FIND QUERY ON A CAPPED COLLECTION WILL DISPLAY RESULTS IN INSERTION ORDER
+-- CHANGE THE ORDER WITH A SORT OPERATION. 
+
+EXAMPLE (REVERSE ORDER):
+------------------------
+
+db.MyCappedCol.find().sort({$natural:-1})
+
+-- YOU CAN DO NORMAL COLLECTION OPERATIONS, EXCEPT THE DELETE
+
+db.MyCappedCol.remove( { col1: 4} )
+
+-- MAKE SURE YOUR UPDATE DO NOT EXCEED THE SIZE LIMIT
+
+-- SOME INTERNAL COLLECTIONS ARE CAPPED. EXAMPLE:
+
+use local
+db.oplog.$main.find()        // show some replication log data
+
+
+-- LET'S SEE AN EXAMPLE WHERE OLD DATA IS ERASED
+
+use foo;
+db.createCollection("OldDataCappedCol", { capped:true, size: 15, max: 5 } )
+
+db.OldDataCappedCol.insert({col1: 1})
+db.OldDataCappedCol.insert({col1: 5})
+db.OldDataCappedCol.insert({col1: 3})
+db.OldDataCappedCol.insert({col1: 99})
+db.OldDataCappedCol.insert({col1: 8})
+
+db.OldDataCappedCol.find()
+
+db.OldDataCappedCol.insert({col1: 84})
+
+db.OldDataCappedCol.find()
+

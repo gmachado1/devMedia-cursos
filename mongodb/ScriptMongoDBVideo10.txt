@@ -1,0 +1,95 @@
+rm--------------------
+     INDEXES
+--------------------
+
+-- INDEXES ARE CREATED TO SPEEP UP OPERATIONS IN COLLECTIONS
+-- THEY ARE SIMILAR TO INDEXES IN THE RELATIONAL WORLD
+
+-- BEFORE CREATING THE INDEX YOU MUST KNOW:
+  -> THE KEY (OR KEYS) OF THE INDEX
+  -> THE ORDER IN WHICH THE INDEX WILL BE CREATED (ASCENDING OR DESCENDING)
+  -> THE INDEX WILL REQUIRE SPACE IN DISK
+  -> EVERY COLLECTION (FOR NON CAPED COLLECTIONS) CONTAINS AN INDEX IN THE _id FIELD
+  
+-- TO CREATE AN INDEX FOR A COLLECTION USE THE ensureIndex() METHOD
+-- AND SUPPLY THE THE NAME OF THE ATTRIBUTE AND THE ORDER. EXAMPLE:
+
+use foo;
+db.people.insert( {name: "Able"});
+db.people.insert( {name: "Beth"});
+db.people.insert( {name: "Mary"});
+db.people.insert( {name: "Jonh"});
+db.people.insert( {name: "Mark"});
+
+db.people.find();
+
+-- NOW LETS CREATE AN INDEX FOR THE name ATTRIBUTE IN ALPHABETIC ORDER
+-- THE VALUE 1 AFTER THE ATTRIBUTE NAME IS USED FOR ASCEDING ORDER
+
+db.people.ensureIndex( {name:1} );
+
+-- NOTE: A SIMPLE FIND WONT SHOW THE ORDERED DATA!
+-- REASON: THERE IS AN INDEX ON THE _id ATRIBUTE
+
+-- QUERIES THAT SEARCH FOR THE name ATTRIBUTE WILL USE THE INDEX
+
+db.people.find({name: "Mary"});
+
+-- SORTING OPERATIONS IN THE name ATTRIBUTE WILL ALSO USE THE INDEX
+
+db.people.find().sort({name:1});
+db.people.find().sort({name:-1});
+
+-- TO SEE ALL THE INDEXES IN A COLLECTION USE THE getIndexes() METHOD
+
+db.people.getIndexes();
+
+
+-- IT IS POSSIBLE TO CREATE A COMPOUND INDEX (WITH MORE THAN ONE KEY). EXAMPLE:
+
+db.CompIndex.insert({ id: 1, name: "A" });
+db.CompIndex.insert({ id: 3, name: "C" });
+db.CompIndex.insert({ id: 5, name: "E" });
+db.CompIndex.insert({ id: 2, name: "B" });
+db.CompIndex.insert({ id: 4, name: "D" });
+
+db.CompIndex.find();
+
+-- CREATING A COMPOUND INDEX: FIELD id->ASCENDING AND FIELD name->DESCENDING
+db.CompIndex.ensureIndex ( {id: 1, name: -1} );
+
+db.CompIndex.getIndexes();
+
+
+-- YOU CAL ALSO CREATE UNIQUE INDEXES. EXAMPLE:
+
+db.ColNumbers.insert({ number: 1});
+db.ColNumbers.insert({ number: 2});
+db.ColNumbers.insert({ number: 3});
+db.ColNumbers.insert({ number: 4});
+
+db.ColNumbers.find();
+
+db.ColNumbers.ensureIndex ({number:1}, {unique: true} );
+
+db.ColNumbers.getIndexes();
+
+-- THE NEXT INSERT WILL FAIL
+db.ColNumbers.insert({ number: 4});
+
+
+-- TO SEE ALL THE INDEXES IN THE DATABASE USE THE system.indexes COLLECTION:
+
+db.system.indexes.find();
+
+-- USE THE IT (ITERATE) KEYWORD TO SEE ALL THE RESULTS
+
+-- TO REMOVE A INDEX USE THE dropIndex() METHOD:
+
+db.people.getIndexes();
+db.people.dropIndex({name:1});
+db.people.getIndexes();
+
+-- TO REINDEX ALL THE INDEXES (REORGANIZE AN INDEX) USE THE reIndex() METHOD:
+
+db.people.reIndex();

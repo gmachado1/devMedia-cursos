@@ -1,0 +1,168 @@
+CRUD OPERATIONS 
+---------------
+-- CRUD STANDS FOR:
+  -- CREATE
+  -- READ
+  -- UPDATE 
+  -- DELETE
+
+-- CRUD OPERATIONS ARE USED TO MANIPULATE DATA IN MONGODB
+
+-- IN THE RELATIONAL WORLD CRUD OPERATIONS 
+-- HAVE THE FORM OF SQL STATEMENTS. FOR INSTANCE:
+
+--  CREATE -> INSERT STATEMENT. EX: INSERT INTO TABLE VALUES(1,X)
+--  READ   -> SELECT STATEMENT. EX: SELECT COL1 FROM TABLE
+--  UPDATE -> UPDATE STATEMENT. EX: UPDATE TABLE SET COL1 = 2
+--  DELETE -> DELETE STATEMENT. EX: DELETE TABLE WHERE COL1 = 1
+
+-- IN MONGODB CRUD OPERATIONS HAVE THE FORM OF METHOD CALLS
+-- REMEMBER: WE HAVE COLLECTIONS THAT CONTAIN DOCUMENTS WITH ATTRIBUTES
+
+-- LET'S SEE EACH CRUD OPERATION IN DETAILS
+
+-- CREATING DATA (CREATE)
+-------------------------
+
+>show dbs
+>use foo
+>show collections
+
+-- LETS CREATE A DOCUMENT WITH TWO ATRIBUTES
+> db.ColCreate.insert({col1:'string data',col2:4})
+> db.ColCreate.find()
+
+-- ANOTHER EXAMPLES
+db.ColCreate.insert({col2: new Date()})
+db.ColCreate.insert({col1: 4})
+db.ColCreate.insert({col1: 'string data'})
+db.ColCreate.insert({col1: 33.33})
+db.ColCreate.insert({col1: new Date('November 25,2011')})
+db.ColCreate.insert({col1: ['first','second',3]})
+db.ColCreate.insert({col1: true})
+> db.ColCreate.find()
+
+-- YOU CAN ALSO CREATE A VARIABLE AND THEN USE THE SAVE METHOD
+
+var x = {col1: 6, col2: 'another string'}
+db.ColCreate.save(x)
+
+-- READING DATA (READ)
+----------------------
+
+-- THE CONCEPT OF READING DATA IS DIVIDED IN TWO: 
+-- FIND AND SHOW
+
+-- TO FIND YOU HAVE METHODS LIKE FIND() AND FINDONE()
+-- TO SHOW YOU CAN USE THE VARIABLE NAME 
+
+-- SIMPLE FIND() EXAMPLE
+
+> db.ColFind.insert({col1: 1, col2: 'One'})
+> db.ColFind.find()
+
+-- YOU CAN FILTER BY DOCUMENTS WITH FIND() AND FINDONE()
+
+db.ColFind.insert({col1: 2,col2: 'Two'})
+db.ColFind.insert({col1: 3,col2: 'Three'})
+db.ColFind.insert({col1: 4,col2: 'Four'})
+db.ColFind.insert({col1: 5,col2: 'Five'})
+db.ColFind.insert({col1: 6,col2: 'Six'})
+db.ColFind.insert({col1: 7,col2: 'Seven'})
+
+-- FINDING JUST ONE DOCUMENT (VARIABLE)
+> var x = db.ColFind.findOne({col1:4})
+> x
+
+-- EXAMPLE WITH TWO FILTERS
+
+> var y = db.ColFind.findOne({col1:6, col2: 'Six'})
+> y
+
+-- FINDING MANY DOCUMENTS (CURSOR)
+> var cursor = db.ColFind.find()
+> cursor
+
+-- OPERATORS USED IN FIND WILL BE SHOW IN ANOTHER VIDEO
+
+-- YOU CAN ALSO SORT THE DATA OR LIMIT THE NUMBER OF DOCUMENTS
+-- WITH FIND() OR FINDONE()
+
+> db.ColFind.find().sort({col1:1})
+> db.ColFind.find().sort({col2:1})
+
+> db.ColFind.find().limit(2)
+
+
+-- UPDATING DATA (UPDATE)
+-------------------------
+
+-- YOU JUST USE THE UPDATE METHOD
+-- THE FIRST PARAMETER IS THE DOCUMENT TO LOOK FOR (FILTER)
+-- AND THE SECOND PARAMENTER IS THE NEW DOCUMENT WITH VALUES
+-- BUT YOU CANNOT CHANGE THE VALUE OF THE _id DOCUMENT
+-- SIMPLE EXAMPLE:
+
+db.Students.insert({group: 'A', name: 'Jonh', grade: 8.0})
+db.Students.insert({group: 'B', name: 'Mary', grade: 7.6})
+db.Students.insert({group: 'C', name: 'Dana', grade: 5.0})
+db.Students.insert({group: 'D', name: 'Malcolm', grade: 9.0})
+db.Students.find()
+
+-- UPDATING THE ENTIRE DOCUMENT 
+>db.Students.update({name:'Dana'},{group: 'E', name: 'Dana Carey', grade: 5.0})
+>db.Students.find()
+
+-- YOU CAN UPDATE ONLY SPECIFIC COLUMN VALUES USING THE $set OPERATOR 
+-- IF THE SPECIFIC COLUMN DOES NOT EXIST IT IS CREATED
+
+-- EXAMPLE TO CHANGE AN EXISTING VALUE
+
+>db.Students.update({group:'D'},{ $set: {grade: 9.8}})
+>db.Students.find()
+
+-- EXAMPLE TO CREATE A NEW COLUMNS 
+
+>db.Students.update({group:'D'},{ $set: {genius: true}})
+>db.Students.find()
+
+-- YOU HAVE OTHERS OPERATIONS. FOR ARRAYS YOU USE $push.
+-- EXAMPLE:
+
+>db.ColArray.insert({ _id : "a" })
+>db.ColArray.insert({ _id : "b", ancestors : [ "a" ]})
+>db.ColArray.insert({ _id : "c", ancestors : [ "a", "b" ]})
+>db.ColArray.find()
+
+-- INSERTIG THE ELEMENT "b" IN THE ARRAY ANCESTORS OF THE SECOND DOCUMENT
+
+>db.ColArray.update({_id: "b"}, { $push: { ancestors: "b"}})
+>db.ColArray.find()
+
+-- DELETING DATA (DELETE)
+-------------------------
+
+-- TO DELETE DATA YOU USE THE REMOVE() METHOD
+-- USE IT WITH CAUTION! AND HAVE BACKUPS
+
+-- YOU CAN FILTER WHICH DOCUMENTS TO REMOVE IN THE FIRST PARAMENTER
+
+-- EXAMPLES
+
+db.ColRemove.insert({col1: 4})
+db.ColRemove.insert({col1: 'string data'})
+db.ColRemove.insert({col1: 33.33})
+db.ColRemove.insert({col1: new Date('November 25,2011')})
+db.ColRemove.insert({col1: ['first','second',3]})
+db.ColRemove.insert({col1: true})
+db.ColRemove.find()
+
+-- REMOVE ONLY ONE DOCUMENT
+
+> db.ColRemove.remove({col1: true})
+> db.ColRemove.find()
+
+-- REMOVE ALL THE DOCUMENTS
+
+> db.ColRemove.remove({})
+> db.ColRemove.find()

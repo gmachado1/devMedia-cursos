@@ -1,0 +1,167 @@
+---------
+OPERATORS
+---------
+
+-- MONGODB USE OPERATORS TO COMPARE, UPDATE AND HANDLE DATA VALUES
+
+-- THE OPERATORS ARE USED WITH COLLECTIONS AND WITHIN METHODS
+-- SUCH AS UPDATE(), DELETE(), FIND(), FINDONE(), ETC
+
+-- THE SYNTAX OF THE OPERATOR DEPENDS OF THE OPERANDS
+-- OPERATORS START WITH $ (DOLAR SIGN)
+-- YOU CAN COMBINE OPERATORS TO PERFORM COMPLEX OPERATIONS
+
+-- EXAMPLE OF SYNTAX FORMAT:
+
+db.collection.find({field: {$operator: value}})
+
+-- NUMERICAL OPERATORS
+-----------------------
+
+$gt       -> GREATER THEN  (>)
+$gte      -> GREATER THEN OR EQUAL (>=)
+$lt       -> LESS THEN (<)
+$lte      -> LESS THEN OR EQUAL (<=)
+$ne       -> NOT EQUAL (!= OR <>)
+$mod      -> MODULE OPERATOR
+
+-- EXAMPLES
+>show dbs
+>use foo
+>show collections
+
+ db.ColOpNumbers.insert({value: 4})  
+ db.ColOpNumbers.insert({value: 5})  
+ db.ColOpNumbers.insert({value: 2})
+ db.ColOpNumbers.insert({value: 1})
+ db.ColOpNumbers.insert({value: 7})
+ db.ColOpNumbers.insert({value: 9})
+ db.ColOpNumbers.find()
+
+> db.ColOpNumbers.find({ value: {$gt: 5}})   // > 5
+> db.ColOpNumbers.find({ value: {$gte: 5}})  // >= 5
+
+> db.ColOpNumbers.find({ value: {$lt: 4}})   // < 4
+> db.ColOpNumbers.find({ value: {$lte: 4}})  // <=4
+
+> db.ColOpNumbers.find({ value: {$ne: 7}})   // != 7
+
+> db.ColOpNumbers.find({ value: {$mod: [2,0]}}) // ONLY DIVISIBLE BY 2 (EVEN)
+
+-- NOTE: YOU CAN COMBINE THESE OPERATORS TO SPECIFY RANGE. EXAMPLE:
+
+> db.ColOpNumbers.find({ value: {$gt: 2, $lt: 9}})  // 9 < value < 2
+
+-- YOU CAN ALSO USE THE LOGICAL OPERATORS:
+$and     -> LOGICAL AND
+$or      -> LOGICAL OR
+$not     -> LOGICAL NOT (CAN ONLY BE USE WITH OTHER OPERATORS)
+
+-- EXAMPLES:
+> db.ColOpNumbers.find( { $or:  [ {value: 7}, {value: 9}] } ) // 7 or 9 
+
+> db.ColOpNumbers.find( { value: { $not: {$gt: 5 } } } ) // not greater than 5
+
+
+-- CONDITIONAL OPERATORS
+------------------------
+
+$in        -> INSIDE OR FIND IN AN ARRAY. ANALOGOUS TO IN() IN THE RELATIONAL WORLD
+$nin       -> NOT INSIDE
+$all       -> FIND ALL ELEMENTS IN AN ARRAY
+$size      -> MATCHES ANY ARRAY WITH THE SPECIFIED NUMBER OF ELEMENTS
+$exists    -> CHECK THE EXISTENCE OF A FIELD
+
+-- EXAMPLES:
+
+ db.ColOpCond.insert({ values: ["a","b","c","d"] })  
+ db.ColOpCond.insert({ values: ["b","c"] })  
+ db.ColOpCond.insert({ values: ["d"] })  
+ db.ColOpCond.insert({ values: ["a","d"] })  
+ db.ColOpCond.insert({ values: ["a","d"], v: "another value" })  
+ db.ColOpCond.find()
+
+> db.ColOpCond.find({ values: { $in: ["a"]}})   // docs with "a"
+
+> db.ColOpCond.find({ values: { $nin: ["a"]}})   // docs without "a"
+
+> db.ColOpCond.find({ values: { $all: ["b","c"]}})   // docs only with "b" and "c"
+
+> db.ColOpCond.find({ values: { $size: 2}})   // docs only with 2 elements
+> db.ColOpCond.find({ values: { $size: 1}})   // docs only with 1 element
+
+> db.ColOpCond.find({ v: { $exists: true }})   // docs with the v field
+> db.ColOpCond.find({ v: { $exists: false }})   // docs without the v field
+
+$where     -> ALLOW THE USE OF A JAVASCRIPT EXPRESSION. 
+              EACH DOCUMENT WILL BE CHECKED AGAINST THIS EXPRESSION
+
+-- EXAMPLES:
+
+> db.ColOpNumbers.find()
+
+// using a Javascript expression with $where
+> db.ColOpNumbers.find( { $where: "this.value > 3"} )
+
+// using a Javascript function
+> f = function() { return this.value <= 5 }
+> db.ColOpNumbers.find(f);
+
+-- UPDATE OPERATORS
+-----------------------
+$inc       -> INCREMENTS FIELD BY A NUMBER IF IS PRESENT IN THE OBJECT. OTHERWISE SETS THE FIELD VALUE
+$set       -> SET THE FIELD WITH A VALUE
+$unset     -> REMOVE THE FIELD
+$push      -> ADD AN ELEMENT TO AN ARRAY
+$pushAll   -> ADD MANY ELEMENTS TO AN ARRAY
+$pop       -> REMOVE THE LAST ELEMENT OF THE ARRAY
+$pull      -> REMOVE ALL OCCURRENCES OF A SPECIFIC ELEMENT IN A FIELD OR ARRAY
+$pullAll   -> REMOVE ALL OCCURRENCES OF ANY VALUES IN A FIELD OR ARRAY
+
+-- EXAMPLES
+
+ db.ColOpUpdate.insert( { _id: 1, names: ["Steve","Marty","Hal"], qtd: 3} )
+ db.ColOpUpdate.insert( { _id: 2, names: ["Mary","Rose", "Claire"], qtd: 3} )
+ db.ColOpUpdate.insert( { _id: 3, names: ["Carl","Sarah"], qtd: 4} )
+> db.ColOpUpdate.find()
+
+// increase by 1 the qtd field where _id = 1
+ db.ColOpUpdate.update( {_id: 1},  { $inc: { qtd: 1} } ) 
+ db.ColOpUpdate.find()
+
+// Set the qtd field to 5 where _id = 3
+ db.ColOpUpdate.update( {_id: 3},  { $set: {qtd: 5} }  )
+ db.ColOpUpdate.find()
+
+// Remove the v field from the ColOpCond collection
+ db.ColOpCond.find()
+ db.ColOpCond.update({}, { $unset: { v: 1 } },false, true )
+ db.ColOpCond.find()
+
+// Insert an element into the array
+> db.ColOpUpdate.find()
+> db.ColOpUpdate.update({_id: 1}, { $push: { names: "Moe" }})
+> db.ColOpUpdate.find()
+
+// Insert many elements into the array
+> db.ColOpUpdate.update({_id: 3}, { $pushAll: { names: ["Peter","Joana","Mario"] }})
+>//if you got error 
+new Schema({ arr: [String] }, { usePushEach: true }); 
+
+> db.ColOpUpdate.find()
+
+// Remove the last element of the array
+> db.ColOpUpdate.find({_id: 2})
+> db.ColOpUpdate.update({_id: 2}, { $pop: {names:1} }) 
+> db.ColOpUpdate.find({_id: 2})
+
+// Remove a specific element of the array
+
+> db.ColArrayPull.insert({ data: [1,1,2,3,4,4,1,5,6,7,8,8]})
+> db.ColArrayPull.find()
+> db.ColArrayPull.update({}, {$pull: { data: 1 } }) // REMOVING ALL OCCURENCES OF 1
+> db.ColArrayPull.find()
+
+// Remove many elments of the array in a single operation
+> db.ColArrayPull.update({}, {$pullAll: { data: [4,8] } }) // REMOVING ALL OCCURENCES OF 4 and 8
+> db.ColArrayPull.find()

@@ -1,0 +1,151 @@
+-----------
+AGGREGATION
+-----------
+
+-- MONGODB SUPPORT AGGREGATIONS TO GROUP DATA TOGETHER AND PERFORM OPERATIONS
+
+-- COMMON OPERATIONS INCLUDE: 
+  -- COUNT THE NUMBER OF ELEMENTS
+  -- COUNT THE DISTINCT NUMBER OF ELEMENTS
+  -- GET THE MEAN VALUE 
+  -- GET THE MIN AND MAX VALUES
+  
+-- HOWEVER, MONGODB HAVE SIMPLE AGGREGATIONS FUNCTIONS
+-- MORE COMPLEX PROCESSING CAN BE DONE WITH $group AND MAP/REDUCE
+
+-- LET'S SEE SOME EXAMPLES.
+-- FIRST A SIMPLE COLLECTION
+
+use foo;
+db.ColAgg.insert( { nro: 1, color: 'blue', otherattrib: 2.2 } );
+db.ColAgg.insert( { nro: 2, color: 'red', otherattrib: 0.1 } );
+db.ColAgg.insert( { nro: 3, color: 'blue', otherattrib: 5.0 } );
+db.ColAgg.insert( { nro: 4, color: 'black', otherattrib: -3.7 } );
+db.ColAgg.insert( { nro: 5, color: 'pink', otherattrib: 1.1 } );
+db.ColAgg.insert( { nro: 6, color: 'green', otherattrib: 4.01 } );
+db.ColAgg.find();
+
+-- TO COUNT THE NUMBER OF ELEMENTS WE USE THE count() METHOD:
+
+db.ColAgg.count();
+
+-- WE CAN FILTER WHAT WE WANT TO COUNT USING A DOCUMENT AS A PARAMETER FOR count()
+
+-- EXAMPLE: COUNTING ONLY THE DOCUMENTS THAT HAVE A SPECIFIC COLOR
+db.ColAgg.count({color:'blue'});
+db.ColAgg.count({color:'red'});
+
+-- EXAMPLE: COUNTING ONLY THE DOCUMENTS IN WHICH THE nro ATTRIBUTE IS GREATER THAN 3
+db.ColAgg.count({ nro: {$gt: 3} });
+
+-- EXAMPLE: COUNTING ONLY THE DOCUMENTS IN WHICH THE nro ATTRIBUTE IS GREATER THAN 3
+-- AND THE VALUE FOR THE OTHERATTRIB IS NEGATIVE
+
+db.ColAgg.count({ nro: {$gt: 3}, otherattrib: {$lt: 0} });
+
+
+-- WE HAVE THE DISTINCT METHOD TO RETURN ONLY DISTINCT VALUES FOR AN ATRIBUTE. 
+-- NOTE: DISTINCT RETURN THE VALUES NOT THE COUNT!
+-- NOTE: DISTINCT DO NOT RECEIVE A DOCUMENT AS A PARAMETER!
+
+-- EXAMPLE:
+
+db.ColAgg.count();
+db.ColAgg.distinct("color");
+db.ColAgg.distinct("nro");
+
+-- WE CAN FILTER WHILE USING DISTINCT
+db.ColAgg.distinct("color",{nro: 5});
+
+-- IN DISTINCT AND COUNT WE CAN REFERENCE A NESTED KEY. 
+-- EXAMPLE:
+
+db.ColNested.insert( { "person":  {"age": 25}} )
+db.ColNested.insert( { "person":  {"age": 31}} )
+db.ColNested.insert( { "person":  {"age": 25}} )
+db.ColNested.find()
+
+db.ColNested.count()
+db.ColNested.count({ "person.age": 25 })
+db.ColNested.count({ "person.age": 31 })
+
+db.ColNested.distinct("person.age")
+
+-- NOW LETS TALK ABOUT GROUPING. IN THE RELATIONAL WORLD
+-- WE HAVE THE GROUP BY STATEMENT AND AGGREATE FUNCTIONS
+-- USED IN THE SELECT STATEMENT. EXAMPLE:
+
+SELECT A
+      ,B
+      ,SUM(C) AS CSUM 
+FROM COLL 
+WHERE ACTIVE=1 
+GROUP BY A,B
+
+-- THE SELECT STATEMENT FILTER FOR THE ROWS WHERE THE VALUE OF THE ACTIVE COLUMN EQUALS 1
+-- AND GROUP ALL THE ROWS BY THE COLUMNS A AND B
+-- AND THEN SUM THE VALUES OF THE C COLUMN FOR EACH COMBINATION OF THE VALUES A AND B
+
+-- WE DO HAVE THIS FUNCTIONALITY IN MONGODB WITH THE aggregate() METHOD
+-- AND THE $GROUP OPERATOR USED WITH THE ACCUMULATORS OPERATORS
+
+
+$sum    -> SUM FOR EACH GROUP
+$avg    -> AVERAGE FOR EACH GROUP
+$max    -> MAX VALUE FOR EACH GROUP
+$min    -> MINIMUM VALUE FOR EACH GROUP
+$first  -> FIRST VALUE FOR EACH GROUP
+$last   -> LAST VALUE FOR EACH GROUP
+ 
+-- SYNTAX:
+
+
+db.Collection.aggregate( { 
+        $group: { _id:  "<$attrib>" , <name_agg> : { <$accumulator> : <$attrib_agg> } } 
+        } );
+
+-- NOTE: MULTIPLE $group CAN BE USED ON THE aggregate METHOD()
+-- NOTE: YOU CAN USE THE $sort OPERATOR TO ORDER THE DATA
+-- NOTE: YOU CAN USE THE $match OPERATOR TO FILTER THE DATA
+
+-- LET'S CREATE A SIMPLE AGGREGATE BY THE b ATTRIBUTE
+-- FIRST A SAMPLE COLLECTION:
+
+db.ColGroup.insert( { a: 1, b: "X", c: 0.1, active: 1} )
+db.ColGroup.insert( { a: 2, b: "X", c: 0.4, active: 1} )
+db.ColGroup.insert( { a: 3, b: "Y", c: 0.0, active: 1} )
+db.ColGroup.insert( { a: 1, b: "Y", c: 0.3, active: 1} )
+db.ColGroup.insert( { a: 1, b: "X", c: 0.1, active: 1} )
+db.ColGroup.insert( { a: 2, b: "Y", c: 0.2, active: 0} )
+db.ColGroup.insert( { a: 2, b: "Y", c: 0.5, active: 1} )
+db.ColGroup.insert( { a: 3, b: "X", c: 0.2, active: 1} )
+db.ColGroup.find();
+
+-- NOW THE aggregate() CALL:
+
+db.ColGroup.aggregate( { $group : { _id: "$b" , total_b : { $sum : 1 }} }); 
+
+-- EQUIVALENT SQL:
+
+SELECT B, COUNT(B) as total_b
+FROM TABLE
+GROUP BY B
+
+-- YOU CAN ALSO SORT THE RESULT WITH THE $sort OPERATOR
+
+db.ColGroup.aggregate( { $group : { _id: "$b" , total_b : { $sum : 1 }} }, { $sort: {_id: 1}  }); 
+
+-- AGGREGATE BY b AND SUM BY THE c ATTRIBUTE
+db.ColGroup.aggregate( { $group : { _id: "$b" , sum_c : { $sum : "$c" }} }); 
+
+-- EQUIVALENT SQL:
+SELECT B, SUM(C) as sum_c
+FROM TABLE
+GROUP BY B
+
+-- YOU CAN FILTER THE DATA USING THE $match OPERATOR 
+-- IN AGGREGATE'S first PARAMETER
+
+-- EXAMPLE: AGGREGATE BY b AND SUM BY THE c ATTRIBUTE ONLY WHEN ACTIVE
+
+db.ColGroup.aggregate({ $match: { active: 1 }} ,  { $group : { _id: "$b" , sum_c : { $sum : "$c" }} }); 

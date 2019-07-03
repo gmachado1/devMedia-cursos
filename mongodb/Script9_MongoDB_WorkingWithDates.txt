@@ -1,0 +1,68 @@
+-----------------------------
+WORKING WITHS DATE ON MONGODB
+-----------------------------
+
+-- MONGODB USES AN INTERNAL DATE OBJECT
+
+-- ALL MANIPULATIONS ARE MADE USING THE DATE OBJECT 
+
+-- USE THE SAME JAVASCRIPT ELEMENTS TO WORK WITH DATES
+
+-- EXAMPLE:
+
+use foo;
+
+db.ColDate.insert({aDate: new Date() });
+
+db.ColDate.find();
+
+-- TO WORK WITH DATES CREATE A VARIABLE;
+
+var doc = db.ColDate.findOne();
+doc.aDate;
+
+-- TO EXTRACT PART OF THE DATE USE THE getxxx() METHODS:
+
+doc.aDate.getMonth();  // Month (January = 0 and December = 11)
+doc.aDate.getDate();  	     // Day inside the Month()
+doc.aDate.getFullYear();  	// Year with four digits
+
+-- YOU CAN CHANGE THE DATE FORMAT USING THE FUNCTIONS 
+-- THAT GET PART OF THE DATE
+
+-- NOTE: TRY TO CHANGE THE FORMAT INSIDE THE APPLICATION
+
+doc.aDate;
+doc.aDate.getDate() + '/' + (doc.aDate.getMonth() + 1) + '/' + doc.aDate.getFullYear(); // DD/MM/AAAA
+
+
+-- YOU CAN PERFORM ARITHMETHIC OPERATION WITH DATES
+-- USE THE setDate() FUNCTION
+
+-- NOTE: AVOID USING THE $inc, $gt and other MongoDB operators
+-- TRY TO USE A FUNCTION AND THE $WHERE OPERATOR
+
+-- IT'S A GOOD IDEIA TO CREATE A FUNCTION TO CHANGE THE DATE FORMAT
+-- OR SEARCH FOR IT
+
+// using a Javascript function
+f = function() { return this.value <= 5 }
+db.ColOpNumbers.find(f);
+
+
+-- TO ADD TREE DAYS ON A DATE:
+
+doc.aDate
+doc.aDate.setDate(doc.aDate.getDate() + 3);
+doc.aDate
+
+-- TO GET THE DIFFERENCE OF DATES IN DAYS
+-- <date1>  - <date2> [/<qtd_miliseconds>]
+
+-- EXAMPLE: DAYS FROM 2001-01-01 UNTIL TODAY 
+	
+var x = new Date();
+var y = new Date('2001-01-01');
+var z = x - y;
+z
+z/(24*3600*1000);

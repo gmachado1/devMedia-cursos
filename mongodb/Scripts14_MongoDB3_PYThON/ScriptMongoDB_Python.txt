@@ -1,0 +1,27 @@
+-----------------------------------------
+MONGODB AND PYTHON
+-----------------------------------------
+
+
+1) PYTHON
+
+	1.1) TO SETUP DE ENVIRONMENT DOWNLOAD PYTHON FOR WINDOWS AT:
+
+		https://www.python.org/downloads/
+
+	1.2) DOWNLOAD PyMongo: http://pypi.python.org/pypi/pymongo/
+			       
+			  Python is installed on: C:\Python34     
+			  
+			  Documentation: http://api.mongodb.org/python/current/tutorial.html
+			       
+   1.3) CHECK TO SEE IF THE IMPORT IS CORRECT
+   >>> import pymongo
+
+   1.4) CHECK FOR PYMONGO
+   
+   python -c "import pymongo; print(pymongo.version); print(pymongo.has_c())"
+   
+   1.4) START PROGRAMMING: MongoDBPython.py
+  
+        python e:\Scripts\video10\MongoDBPython.py

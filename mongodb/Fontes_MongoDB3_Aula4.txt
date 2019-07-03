@@ -1,0 +1,105 @@
+DATATYPES IN MONGODB
+--------------------
+
+-- MONGODB SUPPORT MANY DATATYPES FOR THE DOCUMENT'S ATRIBUTES 
+-- INSIDE THE COLLECTIONS
+
+-- ONE IMPORTANTE CONCEPT IN MONGODB: FREE SCHEMA DESIGN!
+-- OR 'YOU DON'T HAVE A SPECIFIED FORMAT FOR THE DATA'
+
+-- MEANS YOU CAN STORE ANYTHING YOU LIKE WITHOUT WORRYING ABOUT 
+-- THE SAME ATRIBUTES OR DATATYPES FOR THE DOCUMENT'S DATA
+
+-- EXAMPLE: CREATE NEW ATRIBUTES ON THE FLY
+
+>show dbs
+>use foo
+>show collections
+
+-- LETS CREATE A DOCUMENT 
+> db.MyCol.insert({col1:'string data',col2:4})
+> db.MyCol.find()
+
+-- NOW LETS CREATE ANOTHER DOCUMENT WITH DIFFERENT VALUES 
+-- FOR THE ATRIBUTES
+
+> db.MyCol.insert({col1:99,col2:'string data again'})
+> db.MyCol.find()
+
+-- YOU CAN EVEN CREATE NEW ATRIBUTES OR FORGET ABOUT SOME OF THEM
+
+> db.MyCol.insert({col5: 4.3})
+> db.MyCol.find()
+
+> db.MyCol.insert({col2: new Date()})
+> db.MyCol.find()
+
+-- THEARE ARE MANY DATATYPES. THE MOST IMPORTAT ARE THE PRIMITE ONES:
+-- NUMBER, STRING (USE '' OR ""), DATE, BOOLEAN, ARRAY
+
+-- THE OTHER VALUES ARE STORED AS OBJECTS
+-- WATCH OUT FOR SYMBOLS, DELIMITERS AND OPERATORS:
+  
+  , -> COMMA TO SEPARATE  ATTRIBUTES. DO NOT USE IT WITH NUMBERS!
+  : -> COLLON TO SPECIFY A VALUE FOR A ATRIBUTE
+ '' OR "" -> QUOTATION MARKS FOR STRINGS
+  ; -> SEMI-COLLON FOR FINISH COMMANDS
+  
+ () -> PARENTHESES FOR METHODS
+ [] -> BRACKETS FOR ARRAYS
+ {} -> CURLY BRACKETS FOR DOCUMENTS
+ .  -> DOT OPERATOR
+ =  -> ASSIGN OPERATOR FOR VARIABLES
+ 
+-- EXAMPLES
+
+> db.ColDataTypes.insert({col1: 4})
+> db.ColDataTypes.insert({col1: 'string data'})
+> db.ColDataTypes.insert({col1: 33.33})
+> db.ColDataTypes.insert({col1: new Date('November 25,2011')})
+> db.ColDataTypes.insert({col1: ['first','second',3]})
+> db.ColDataTypes.insert({col1: true})
+> db.ColDataTypes.find()
+
+-- YOU CAN ALSO USE THE typeof OPERATOR WITH VARIABLES TO CHECK THE DATA
+
+> var x = db.ColDataTypes.findOne({col1:4})
+> x
+> typeof x
+> typeof x.col1
+
+-- NOTE: YOU CAN HAVE YOUR OWN _id ATRIBUTE, BUT WITHOUT REPETITIONS
+-- SIMILAR TO THE PRIMARY KEY CONCEPT. EXAMPLE:
+
+> db.ColPK.insert({_id: 1, name: 'first'})
+> db.ColPK.find()
+
+-- THE NEXT COMMAND GENERATES AN ERROR
+> db.ColPK.insert({_id: 1, name: 'second'}) 
+
+-- TO LINK DOCUMENTS YOU HAVE TWO OPTIONS: DIRECT LINK AND EMBENDDING
+
+-- 1) DIRECT LINK
+
+-- JUST CREATE A VARIABLE AND USE IT'S VALUE IN A ATRIBUTE
+
+> db.DocLinkRef.insert({col1: 'some value'})
+> var MyLink = db.DocLinkRef.findOne({col1: 'some value'})
+> MyLink
+> MyLink._id
+> db.DocLink.insert({c1:'other doc', c2: MyLink._id})
+> db.DocLink.find()
+
+
+-- 2) EMBENDDING
+
+-- CREATE A DOCUMENT INSIDE A DOCUMENT VIA A ATRIBUTES
+
+>db.DocEmb.insert({name:'Jonh',age:25,Children:[ {name:'Mike',sex:'Male'},
+                                                 {name:'Melissa',sex:'Female'}]})
+
+>db.DocEmb.find()
+
+
+
+

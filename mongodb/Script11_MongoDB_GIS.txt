@@ -1,0 +1,164 @@
+--------------------------------------------
+GIS - GEOREFERENCED INFORMATION SYSTEMS
+--------------------------------------------
+
+-- GIS SYSTEM HANDLE GEOSPACIAL TYPES
+-- WE STORE THE DATA (COORDINATES) AND PERFORM OPERATIONS LIKE:
+  -> WHAT IS NEAR A POINT?
+  -> WHAT POINTS ARE CONTAINED WITHIN A SQUARE, SPHERE OR A POLYGON?
+  -> WHAT ARE THE INTERSECT AREAS?
+  
+-- PREVIOUS TO MONGODB 2.4 WE HAVE TO USE AN ARRAY TO STORE COORDINATE PAIRS 
+-- EXAMPLE:
+
+db.ColOldPoints.insert( { name: "My Place", loc: [37.7577 , -122.4376 ] } );
+db.ColOldPoints.find();
+
+-- WE COULD USE SPECIFC OPERATORS LIKE $near OR $box
+
+-- NOTE: THIS EXAMPLE REQUIRES AN INDEX
+
+db.ColOldPoints.find( { loc : 
+                  { $near : [ 100 , 100 ],
+                    $maxDistance: 10 }
+                } );
+ 
+db.ColOldPoints.find( { loc : 
+                  { $geoWithin : 
+                    { $box : 
+                      [ [ 0 , 0 ] , [ 0 , 1 ] , [ 1 , 1 ] , [ 1 , 0 ] ] 
+                 } } } );
+
+
+
+-- AFTER MONGODB 2.4 WE HAVE THE GeoJSON SPECIFICATION TO
+-- STORE FORMATING OF SHAPES AND COORDINATE SPACE
+
+-- SEE: http://geojson.org/
+
+-- THE FORMAT IS BASED ON A SUBDOCUMENT FOR EACH LOCATION
+-- THE SUBDOCUMENT HAS THE TYPE ATTRIBUTE TO IDENTIFY THE SHAPE TYPE
+-- AND AN COORDINATES ATTRIBUTE (AN ARRAY) TO STORE THE DATA
+
+-- TYPES: Point, LineString, Polygon, MultiPoint, MultiLineString, and MultiPolygon.
+-- SOME TYPES HAVE RESTRICTIONS. EXAMPLE: POLYGONS MUST BE CLOSED 
+-- (THE LAST COORDINATE PAIR PROVIDED SHOULD BE THE SAME AS THE FIRST)
+
+-- EXAMPLE:
+
+-- POINT REPRESENTATION
+db.ColNewPlaces.insert( { name: "My fav. point", loc: { type: "Point", coordinates: [37.7577 , -122.4376 ] } } );
+
+-- POLYGON REPRESENTATION (A SQUARE)
+
+db.ColNewPlaces.insert( { name: "A square park", loc: { type: "Polygon", 
+                    coordinates : [  [ [ 0 , 0 ] , [ 0 , 1 ] , [ 1 , 1 ] , [  1 , 0 ] , [ 0 , 0 ] ] ]} } );
+
+db.ColNewPlaces.find();
+
+-- YOU SHOULD USE THE $geoWithin,$geoIntersects, $near AND $nearSphere OPERATORS TO SEARCH 
+
+db.ColNewPlaces.find( { loc : 
+                  { $geoWithin : 
+                    { $geometry : 
+                      { type : "Polygon",
+                        coordinates : [ [ [ 0 , 0 ] , [ 0 , 1 ] , [ 1 , 1 ] , [ 1 , 0 ] , [ 0 , 0 ] ] ]
+                } } } } )
+
+ 
+-- MOST OF THE TIME YOU WILL WORK WITH A APPLICATION TO SEE THE DATA ON A MAP.
+-- FOR TESTING YOU CAN USE THE http://geojsonlint.com/ TI SEE THE POINTS.
+
+-- EXAMPLES:
+
+-- A POINT IN PARIS
+{
+  "type": "Point",
+  "coordinates": [
+    -2.5469,  
+    48.5917 
+  ]
+}
+
+-- A LINE TO SEE A TRAJECTORY
+
+{
+  "type": "LineString",
+  "coordinates": [
+    [-2.551082,48.5955632],
+    [-2.551229,48.594312],
+    [-2.551550,48.593312],
+    [-2.552400,48.592312],
+    [-2.553677, 48.590898]
+  ]
+}
+
+-- A POLYGON AND MULTILINESTRING TO MARK THE CENTRAL PARK IN NEW YORK:
+
+{
+  "type" : "GeometryCollection",
+  "geometries" : [
+    {
+      "type" : "Polygon",
+      "coordinates" : [
+         [
+	  [ -73.9580, 40.8003 ],
+          [ -73.9498, 40.7968 ],
+	  [ -73.9737, 40.7648 ],
+	  [ -73.9814, 40.7681 ],
+	  [ -73.9580, 40.8003  ]
+	 ]
+       ]
+    },
+    {
+      "type" : "MultiLineString",
+      "coordinates" : [
+         [ [ -73.96943, 40.78519 ], [ -73.96082, 40.78095 ] ],
+ 	 [ [ -73.96415, 40.79229 ], [ -73.95544, 40.78854 ] ],
+         [ [ -73.97162, 40.78205 ], [ -73.96374, 40.77715 ] ],
+         [ [ -73.97880, 40.77247 ], [ -73.97036, 40.76811 ] ]
+       ]
+     }
+  ]
+}
+
+-- YOU HAVE SOME GEOSPACIAL INDEXES TO PERFORM OPERATIONS
+-- 2D INDEXES:
+
+    -> CALCULATIONS USING FLAT GEOMETRY
+    -> LEGACY COORDINATE PAIRS (I.E., GEOSPATIAL POINTS ON A FLAT COORDINATE SYSTEM)
+    -> COMPOUND INDEXES WITH ONLY ONE ADDITIONAL FIELD, AS A SUFFIX OF THE 2D INDEX FIELD
+    
+    -- EXAMPLE:
+    db.createCollection("location")
+    
+    db.location.save( {_id: "A", position: [0.001, -0.002]} )
+    db.location.save( {_id: "B", position: [1.0, 1.0]} )
+    db.location.save( {_id: "C", position: [0.5, 0.5]} )
+    db.location.save( {_id: "D", position: [-0.5, -0.5]} )
+
+    db.location.ensureIndex( {position: "2d"} )
+
+    db.location.find( {position: { $near: [0,0], $maxDistance: 0.75  } } )
+    
+    -> RESULT:
+    { "_id" : "A", "position" : [ 0.001, -0.002 ] }
+    { "_id" : "D", "position" : [ -0.5, -0.5 ] }
+    { "_id" : "C", "position" : [ 0.5, 0.5 ] }
+
+    db.location.find( {position: { $within: { $box: [ [0.25, 0.25], [1.0,1.0] ] }  } } )
+    
+    
+    -> RESULT:
+    { "_id" : "C", "position" : [ 0.5, 0.5 ] }
+    { "_id" : "B", "position" : [ 1, 1 ] }
+
+
+-- 2DSPHERE INDEXES
+
+    -> CALCULATIONS ON A SPHERE
+    -> GEOJSON OBJECTS AND INCLUDE BACKWARDS COMPATIBILITY FOR LEGACY COORDINATE PAIRS
+    -> COMPOUND INDEXES WITH SCALAR INDEX FIELDS (I.E. ASCENDING OR DESCENDING) AS A PREFIX OR SUFFIX 
+       OF THE 2DSPHERE INDEX FIELD
+
+

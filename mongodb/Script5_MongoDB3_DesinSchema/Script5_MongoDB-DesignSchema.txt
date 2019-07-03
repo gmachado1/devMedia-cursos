@@ -1,0 +1,208 @@
+SCHEMA DESIGN
+-------------
+
+-- REMEMBER: MONGODB ALLOWS A FREE SCHEMA DESIGN
+-- TRADITIONAL RELATIONAL DATABASES WORK WITH FIXED SCHEMA DESIGN
+
+-- YOU MUST EVALUATE SOME SCHEMA-DESIGN CRITERIA, SUCH AS:
+
+-- HOW CAN WE MANIPULATE THIS DATA?
+  -> DYNAMIC QUERIES
+  -> ATOMIC UPDATES
+  -> MAP REDUCE
+
+-- HOW ABOUT ACCESS PATTERNS?
+  -> READ/WRITE RATION
+  -> TYPES OF UPDATES
+  -> TYPES OF QUERIES
+  -> DATA LIFE CYCLE
+  
+-- AND THE DISCUSSION ABOUT NORMALIZATION x DENORMALIZATION?
+
+-- MONGODB WORKS WITH FREE SCHEMA DESIGN AND
+-- STORE PRIMITIVE TYPES, OBJECTS AND ARRAYS IN A DOCUMENT
+
+-- DOCUMENTS ARE STORED INSIDE COLLECTIONS
+
+-- THIS ALLOWS THE CREATION OF RICH DOCUMENTS
+-- AND THE EVOLUTION OF THE DATA SCHEMA
+
+-- LET'S SEE SOME EXAMPLES
+
+-- A TABLE TO STORE SHAPES AND IT'S PROPERTIES. SEE FIGURE 1
+
+-- IN THE RELATIONAL SCHEMA WE MUST CREATE A TABLE WITH
+-- MANY COLUMNS (OR EVEN MORE THAN ONE TABLE AND CONNECT THEM). SEE FIGURE 2
+
+-- IN MONGODB WE CAN CREATE THE SHAPPES COLLECTION WITH
+-- VARYING COLUMNS FOR THE DOCUMENTS. EXAMPLE:
+
+> use foo
+> db.shapes.insert({_id:1, type:'circle', area:3.14, radius:1})
+> db.shapes.insert({_id:2, type:'square', area:4, d:2})
+> db.shapes.insert({_id:3, type:'rect', area:10, length: 5, width: 2})
+> db.shapes.find()
+
+-- THIS EXAMPLE SHOWED A TYPE OF INHERITANCE RELATIONSHIP
+
+-- HOW ABOUT THE TRADICIONAL MODELING RELATIONSHIPS USED IN 
+-- ENTITY-RELATIONSHIP MODELING? 
+
+-- LET'S STUDY THEN ONE BY ONE
+
+-- WE ARE GOING TO USE TWO WAYS TO CONNECT COLLECTIONS:  LINKING AND EMBENDDING
+-- NOTE: THERE ARE MANY NOTATIONS TO REPRESENT THE ENTITIES IN THE ER DIAGRAM
+
+-- ONE TO ONE
+-------------
+
+-- ONE TO ONE RELATIONSHIPS LINK ONE TABLE TO ANOTHER. 
+
+-- REQUIRES PRIMARY KEY AND FOREIGN KEY IN THE RELATIONAL TABLES
+-- NOT SO COMMON, BUT USED IN CERTAIN CASES. EXAMPLES: FIGURES 3, AND 4
+
+-- CAN BE CREATED IN MONGODB WITH A SIMPLE USE OF LINKING
+-- EXAMPLE:
+
+> db.DocLinkRef.insert({col1: 'some value'})
+> var MyLink = db.DocLinkRef.findOne({col1: 'some value'})
+> MyLink
+> MyLink._id
+> db.DocLink.insert({c1:'other doc', c2: MyLink._id})
+> db.DocLink.find()
+
+
+-- ONE TO MANY
+--------------
+
+-- COMMON RELATIONSHIP USUALLY BETWEEN TWO DIFFERENT ENTITIES 
+-- REQUIRES PRIMARY KEY AND FOREIGN KEY ON THE RELATIONAL TABLES
+
+-- MOST COMMON RELATIONSHIP. EXAMPLES: FIGURES 5, 6, AND 7
+
+-- TWO PATTERNS IN MONGO DB:
+
+-- 1) DIRECT LINK. SEE EXAMPLE ABOVE:
+
+-- 2) EMBEDDED ARRAY (ARRAYS KEYS)
+
+-- EXAMPLE:
+
+ { _id : ObjectId("4c4ba5c0672c685e5e8aabf3"), 
+   author : "Hergé",
+   date : "Sat Jul 24 2010 19:47:11 GMT-0700 (PDT)", 
+   text : "Destination Moon",
+   tags : [ "comic", "adventure" ],
+   comments : [ 
+    {
+      author : "Kyle",
+      date : "Sat Jul 24 2010 20:51:03 GMT-0700 (PDT)",
+      text : "great book",
+      votes : 5
+    }
+   ],
+   comments_count: 1
+ }
+
+
+-- MANY TO MANY
+---------------
+
+-- THIS RELATIONSHIP IS IMPLEMENTED PHYSICALLY BY TWO ONE TO MANY RELATIONSHIPS
+-- DIFFERENCE BETWEEN LOGICAL/PHYSICALLY RELATIONSHIP IN THE MODEL
+
+-- EXAMPLES: FIGURES 8,9, AND 10
+
+-- IMPLEMENTED IN MONGODB WITH LINKING AND EMBENDDING. 
+
+-- EXAMPLE 1: PRODUCTS AND CATEGORIES OF PRODUCTS. 
+--            ARRAY OF CATEGORIES IN PRODUCTS
+
+products:
+ { _id : ObjectId("4c4ca23933fb5941681b912e"),
+   name : "Destination Moon",
+   category_ids : [ ObjectId("4c4ca25433fb5941681b912f"),
+                    ObjectId("4c4ca25433fb5941681b92af”] }
+                           
+                           
+categories:
+{ _id : ObjectId("4c4ca25433fb5941681b912f"),   name : "adventure" }
+
+-- EXAMPLE 2: PRODUCTS AND CATEGORIES OF PRODUCTS
+--            ARRAY OF PRODUCTS IN CATEGORIES
+
+products:
+ { _id : ObjectId("4c4ca23933fb5941681b912e"),
+   name : "Destination Moon" }
+   
+ categories:
+    { _id : ObjectId("4c4ca25433fb5941681b912f"), 
+      name : "adventure", 
+      product_ids : [ ObjectId("4c4ca23933fb5941681b912e"),
+                      ObjectId("4c4ca30433fb5941681b9130"),
+                      ObjectId("4c4ca30433fb5941681b913a"] }
+
+
+-- EXAMPLE 3: PRODUCTS AND CATEGORIES OF PRODUCTS
+--            ARRAY OF PRODUCTS IN CATEGORIES AND 
+--            ARRAY OF CATEGORIES IN PRODUCTS
+
+products:
+ { _id : ObjectId("4c4ca23933fb5941681b912e"),
+   name : "Destination Moon",
+   category_ids : [ ObjectId("4c4ca25433fb5941681b912f"),
+                    ObjectId("4c4ca25433fb5941681b92af”] }
+categories:
+    { _id : ObjectId("4c4ca25433fb5941681b912f"), 
+      name : "adventure", 
+      product_ids : [ ObjectId("4c4ca23933fb5941681b912e"),
+                      ObjectId("4c4ca30433fb5941681b9130"),
+                      ObjectId("4c4ca30433fb5941681b913a"] }
+
+-- TREES
+--------
+
+-- KNOW AS SELF OR AUTO RELATIONSHIP. CONNECTS A TABLE TO ITSELF
+-- REQUIRES A PRIMARY KEY AND A FOREIGN KEY IN THE SAME TABLE. EXAMPLE: FIGURES 11 AND 12
+
+-- MONGODB HANDLE WELL TREES BY NESTING ARRAYS INSIDE COLUMNS OF THE DOCUMENT
+
+-- EXAMPLE 1: FULL TREE IN A DOCUMENT
+
+{ comments: [
+    { author: “Kyle”, text: “...”, 
+      replies: [
+        { author: “Fred”, text: “...”,
+            replies: [ ] } 
+       ]
+     }
+  ]
+}
+
+-- EXAMPLE 2: TREE WITH A SINGLE PARENT 
+
+{ _id : "a" }
+{ _id : "b", parent : "a" }
+{ _id : "c", parent : "b" }
+{ _id : "d", parent : "b" }
+{ _id : "e", parent : "a" }
+{ _id : "f", parent : "e" }
+
+
+-- EXAMPLE 2: TREE WITH A SINGLE PARENT AND ANCESTORS
+
+{ _id : "a" }
+{ _id : "b", ancestors : [ "a" ],      parent : "a" }
+{ _id : "c", ancestors : [ "a", "b" ], parent : "b" }
+{ _id : "d", ancestors : [ "a", "b" ], parent : "b" }
+{ _id : "e", ancestors : [ "a" ]     , parent : "a" }
+{ _id : "f", ancestors : [ "a", "e" ], parent : "e" }
+
+-- EXAMPLE 3: TREE WITH A MULTIPLE PARENTS AND ANCESTORS
+
+{ _id : "a" }
+{ _id : "b", ancestors : [ "a" ], parents : ["a"] }
+{ _id : "c", ancestors : [ "a", "b" ], parents : ["b","a"] }
+{ _id : "d", ancestors : [ "a", "b" ], parents : ["b"] }
+{ _id : "e", ancestors : [ "a" ], parents : ["a","e"] }
+{ _id : "f", ancestors : [ "a", "e" ], parents : ["e"] }

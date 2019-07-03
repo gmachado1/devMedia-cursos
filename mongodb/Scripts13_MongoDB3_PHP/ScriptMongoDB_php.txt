@@ -1,0 +1,36 @@
+-----------------------------------------
+MONGODB AND PHP
+-----------------------------------------
+
+-- 1) PHP
+
+	1.1) TO SETUP THE ENVIRONMENT DOWNLOAD XAMPP AT:
+		http://sourceforge.net/projects/xampp/files/
+
+  IN OUR CASE THE FOLDER FOR THE .PHP FILES IS "C:\CursoMongoDB3\Video13\xampp\htdocs"
+
+	1.2) DOWNLOAD THE DRIVER AT: 
+		https://github.com/mongodb/mongo-php-driver
+		
+	1.3) CHECK OUT THE DOCUMENTATION:
+
+		http://www.php.net/manual/en/mongo.tutorial.php
+
+	1.4) INSTALL IT
+
+    Download the correct driver for your environment from https://github.com/mongodb/mongo-php-driver
+    
+    Check the read me and go to http://pecl.php.net/package/mongo.
+    
+        
+        Unzip and add the php_mongo.dll file to your PHP extensions directory (usually the "ext" folder in your PHP installation - C:\CursoMongoDB3\Video13\xampp\php\ext)
+    
+    Add to your php.ini  (C:\CursoMongoDB3\Video13\xampp\php):
+
+    extension=php_mongo.dll
+
+    Restart your web server (Apache, IIS, etc.) for the change to take effect
+
+  1.5) START PROGRAMMING: MongoPHP.php
+
+  http://localhost/MongoPHP.php
